@@ -8,7 +8,7 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddNewCardPopup from './AddNewCardPopup';
-import { BrowserRouter, Route, Switch, Redirect, useHistory, withRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect, useHistory } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute'
 import Login from './Login'
 import Register from './Register'
@@ -26,13 +26,14 @@ function App() {
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(true);
   const [isInfoToolTipOpen, setInfoToolTipOpen] = React.useState(false);
-  const [tooltipType, setTooltipType] = React.useState(false);
+  const [tooltipType, setTooltipType] = React.useState('');
   const [userEmail, setUserEmail] = React.useState("");
   const [userPassword, setUserPassword] = React.useState("");
   const [userRegistered, setUserRegistered] = React.useState(false)
 
-  const history = useHistory();
+  const history = useHistory({forceRefresh:true});
   
+
   React.useEffect(() => {
     api
       .getInitialCards()
@@ -66,8 +67,6 @@ function App() {
     console.log(error)
   })
 }
-
-
 
 function handleEditAvatarClick () {
   setEditAvatarPopupOpen(true);
@@ -116,6 +115,7 @@ function handleUpdateAvatar({avatar}) {
 }
 
 function handleToolTip(type) {
+  console.log(type)
   setTooltipType(type);
   setInfoToolTipOpen(true);
 }
@@ -176,7 +176,7 @@ React.useEffect(() => {
     <CurrentUserContext.Provider value = {currentUser}>
         <div className = "page">
      
-       <BrowserRouter>
+  <BrowserRouter>
       
       <Header 
         userEmail={userEmail}
@@ -192,6 +192,7 @@ React.useEffect(() => {
             <InfoToolTip
               isOpen={isInfoToolTipOpen}
               onClose={closeAllPopups}
+              tooltipType = {tooltipType}
             />
       </Route>
       <Route exact path="/signup">
@@ -200,13 +201,13 @@ React.useEffect(() => {
           setUserEmail = {setUserEmail}
           userPassword = {userPassword}
           setUserPassword = {setUserPassword}
-          registered = {userRegistered}
           onSubmit={handleRegistration}
         />
         <InfoToolTip
               isOpen={isInfoToolTipOpen}
               onClose={closeAllPopups}
               loggedIn={loggedIn}
+              tooltipType = {tooltipType}
             />
       </Route>
       <Route path="/">
@@ -250,4 +251,4 @@ React.useEffect(() => {
   );
 }
 
-export default withRouter (App);
+export default App;

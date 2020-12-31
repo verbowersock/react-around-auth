@@ -8,11 +8,11 @@ function InfoToolTip(props) {
     <PopupWithForm name='tooltip' isOpen={props.isOpen} onClose={props.onClose} closeButton={true} overlay={true}>
       <img
         className='popup__tooltip-icon'
-        src={props.type === 'success' ? checkmark : fail}
+        src={props.tooltipType === 'success' ? checkmark : fail}
         alt='check mark'
       />
       <h2 className='popup__tooltip-message'>
-        {props.type === 'success'
+        {props.tooltipType === 'success'
           ? 'Success! You have now been registered'
           : 'Oops, something went wrong! Please try again.'}
       </h2>

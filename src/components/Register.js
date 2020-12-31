@@ -1,8 +1,11 @@
 import PopupWithForm from './PopupWithForm'
-import {Link} from 'react-router-dom'
-import React from 'react'
+import {Link, useHistory } from 'react-router-dom'
+import React, {useEffect} from 'react'
+
 
 function Register(props) {
+
+  const history = useHistory();
 
   const handleEmailChange= (e)=> {
       props.setUserEmail(e.target.value)
@@ -11,6 +14,7 @@ function Register(props) {
   const handlePasswordChange= (e)=> {
       props.setUserPassword(e.target.value)
   }
+
 
   return (
     <>
@@ -49,7 +53,6 @@ function Register(props) {
           aria-label="Sign Up"
           value="Sign Up"
           onClick={props.onSubmit}
-          to='/login'
       />
        <Link className='popup__link' to='/login'>
         Already a member? Log in here!
