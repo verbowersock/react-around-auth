@@ -6,6 +6,9 @@ function Header(props) {
   const location = useLocation();
   
     let properties = {text:"", route: "", email: ""}
+    properties = getProperties()
+
+    function getProperties(){
     if (location.pathname === "/signup") { 
       properties.text ="Log in"
       properties.route = "/login"
@@ -18,25 +21,25 @@ function Header(props) {
     }
     else {
       properties.text ="Log out"
-      properties.route = "/login"
       properties.email = props.userEmail
+      properties.route = '/login'
     }
+    return properties
+  }
 
   return (
     <>
     <header className="header">
       <img className="header__logo" src={logo} alt="Around the US logo" />
       <div className="header__email">
+
     {properties.email}
     
-    <Link to = {properties.route} className={`header__link `+ (location.pathname === "/signup"||location.pathname ==="/login" ? '':'header__link_logged-in')} >
+    <Link to = {properties.route} className={`header__link `+ (location.pathname === "/signup"||location.pathname ==="/login" ? '':'header__link_logged-in')} onClick = {location.pathname === "/"?props.onSignOut:null}> 
     {properties.text}
     </Link>
     </div>
     </header>
-    <Link className="header__link">
-      
-    </Link>
     </>
   );
 }

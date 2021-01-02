@@ -8,7 +8,7 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddNewCardPopup from './AddNewCardPopup';
-import { BrowserRouter, Route, Switch, Redirect, useHistory } from 'react-router-dom';
+import {Route, Switch, useHistory } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute'
 import Login from './Login'
 import Register from './Register'
@@ -24,7 +24,7 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [currentUser, setCurrentUser] = React.useState(null);
   const [cards, setCards] = React.useState([]);
-  const [loggedIn, setLoggedIn] = React.useState(true);
+  const [loggedIn, setLoggedIn] = React.useState(false);
   const [isInfoToolTipOpen, setInfoToolTipOpen] = React.useState(false);
   const [tooltipType, setTooltipType] = React.useState('');
   const [userEmail, setUserEmail] = React.useState("");
@@ -115,7 +115,6 @@ function handleUpdateAvatar({avatar}) {
 }
 
 function handleToolTip(type) {
-  console.log(type)
   setTooltipType(type);
   setInfoToolTipOpen(true);
 }
@@ -136,7 +135,6 @@ function resetForm () {
 }
 
 function handleRegistration() {
-    console.log("form submitted")
     auth.register(userEmail, userPassword)
       .then((res) => {
         if (!res.data) {
@@ -160,6 +158,55 @@ function handleRegistration() {
       });
   }
 
+  function handleLogin() {
+    auth
+      .authorize(userEmail, userPassword)
+      .then((res) => {
+        if (!userEmail || !userPassword) { 
+          handleToolTip('fail');
+          resetForm(); 
+          throw new Error('400 - one or more of the fields were not provided');
+        }
+        else if (!res) {
+          handleToolTip('fail');
+          resetForm(); 
+          throw new Error('01 - the user with the specified email not found');
+        }
+      })
+      .then(() => {
+        setLoggedIn(true)
+      })
+      .then(() => {
+        history.push('/');
+      })
+      .catch((err) => console.log(err.message));
+  };
+  
+  function handleSignOut () {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    history.push('/login');
+  }
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          setLoggedIn(true);
+          setUserEmail(res.data.email);
+        })
+        .then(()=> 
+        history.push("/"))
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setLoggedIn(false);
+    }
+  },[history]);
+  
 
 React.useEffect(() => {
   api
@@ -175,24 +222,25 @@ React.useEffect(() => {
   return (
     <CurrentUserContext.Provider value = {currentUser}>
         <div className = "page">
-     
-  <BrowserRouter>
-      
       <Header 
         userEmail={userEmail}
         loggedIn={loggedIn}
+        onSignOut = {handleSignOut}
       />
       <Switch>
       <Route exact path="/login">
             <Login 
-            userEmail={userEmail}
-            userPassword={userPassword}
-            loggedIn={loggedIn}
+             userEmail = {userEmail}
+             setUserEmail = {setUserEmail}
+             userPassword = {userPassword}
+             setUserPassword = {setUserPassword}
+             onSubmit={handleLogin}
             />
             <InfoToolTip
               isOpen={isInfoToolTipOpen}
               onClose={closeAllPopups}
               tooltipType = {tooltipType}
+              loggedIn={loggedIn}
             />
       </Route>
       <Route exact path="/signup">
@@ -242,10 +290,8 @@ React.useEffect(() => {
             onCardDelete = {handleCardDelete}
             onCardLike={handleCardLike}/>    
       <Footer />
-
       </Route>
       </Switch> 
-    </BrowserRouter>
     </div>
     </CurrentUserContext.Provider>  
   );
