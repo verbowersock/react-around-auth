@@ -20,6 +20,8 @@ function AddNewCardPopup (props) {
           title,
           url,
         })
+        setUrl('')
+        setTitle('')
       }
 
     return(
@@ -32,9 +34,9 @@ function AddNewCardPopup (props) {
           name="add" 
           title = "New Place" 
           isOpen = {props.isOpen}>
-            <input type="text" placeholder="Title" id="title-input" required minLength={1} maxLength={30} name="name" className="popup__field popup__field_title" onChange={handleTitleChange}/>
+            <input type="text" placeholder="Title" id="title-input" value={title} required minLength={1} maxLength={30} name="name" className="popup__field popup__field_title" onChange={handleTitleChange}/>
             <span className="popup__input-error" id="title-input-error" />
-            <input type="url" placeholder="Image Link" id="link-input" name="link" required className="popup__field popup__field_link" onChange={handleUrlChange}/>
+            <input type="url" placeholder="Image Link" id="link-input" value={url} name="link" required className="popup__field popup__field_link" onChange={handleUrlChange}/>
             <span className="popup__input-error" id="link-input-error" />
             <input
             type="submit"
